@@ -1,15 +1,17 @@
-name: Merge Main into PR
-
 on:
-  pull_request:
-    types: opened
+  issue_comment:
+    types: [created, deleted, edited]
+    
+#pull_request:
+#types: opened
 
 env:
   DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
 
 jobs:
   main:
-    if: ${{ github.event.label.name == 'merge main' }}
+    if: ${{ github.event.issue.pull_request  && github.event.comment.body == '/merge' }}
+    #if: ${{ github.event.label.name == 'merge main' }}
     name: Merge Main
     runs-on: ubuntu-latest
     steps:
@@ -32,9 +34,3 @@ jobs:
           git merge "$DEFAULT_BRANCH" --no-edit
           git push
           git status
-
-      - name: remove label
-        if: always()
-        uses: actions-ecosystem/action-remove-labels@v1
-        with:
-          labels: merge main
